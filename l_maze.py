@@ -68,8 +68,13 @@ def output_ibex(out_file, lines):
             exp_name  = s[0]
             item_num = s[1]
             real_sentence = s[2]
-            distractor_sentence = s[3]
-            f.write((f"[[\"{exp_name}\", {item_num}] \"Maze\", {{s:\"{real_sentence}\", a:\"x-x-x {distractor_sentence}\"}}],\n"))
+            
+            if len(s[3].split()) > 1:
+                distractor_sentence = " ".join((s[3]).split())
+            else:
+                distractor_sentence = s[3]
+
+            f.write((f"[[\"{exp_name}\", {item_num}], \"Maze\", {{s:\"{real_sentence}\", a:\"{distractor_sentence}\"}}],\n"))
 
 
 if __name__ == '__main__':
@@ -81,7 +86,6 @@ if __name__ == '__main__':
     else:
         print("Error: Currently no support for non-English - stopping the program.")
         quit()
-
 
     new_lines = []
     with open(args.input_file, "r", encoding="utf-8") as f:
