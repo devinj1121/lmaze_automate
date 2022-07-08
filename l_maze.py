@@ -93,7 +93,7 @@ if __name__ == '__main__':
         # NOTE: This is not a comprehensive format check - please check that your lines are formatted as such: expname_cond;item#;sentence
         lines = f.readlines()
         if len(lines[0].split(";")) != 3:
-            print("Error: Improper stimuli formatting. Please format sentences as follows and insure no headings on text file. expname_cond;item#;sentence")
+            print("Error: Improper stimuli formatting. Please format sentences as follows and ensure no headings on text file. expname_cond;item#;sentence")
             quit()
         
         # Get pseudowords for each line
