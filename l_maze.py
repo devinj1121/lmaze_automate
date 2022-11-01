@@ -117,7 +117,8 @@ if __name__ == '__main__':
         for line in lines:
             pseudowords_list = get_pseudowords(line)
             pseudowords_string = " ".join(pseudowords_list)
-            line = line.strip() + ";" + pseudowords_string
+            line = line.strip() + ";" + pseudowords_string.strip()
+            print(line)
             new_lines.append(line)
         
     # Output to Ibex format
