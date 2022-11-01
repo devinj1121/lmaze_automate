@@ -5,6 +5,7 @@ Author: Devin Johnson, 2022
 
 import argparse
 import random
+import re
 from wuggy import WuggyGenerator
 
 
@@ -17,8 +18,8 @@ def parse_args():
         - args (argparse.Namespace): The list of arguments passed in
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "stims.txt")
-    parser.add_argument("-out_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "./stims_lmaze_ibex.txt")
+    parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "items_raw.txt")
+    parser.add_argument("-out_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "./items_ibex.txt")
     parser.add_argument("-lang",type=str, help = "Language of input/pseudowords", default = "EN")
     args = parser.parse_args()
     
@@ -26,40 +27,60 @@ def parse_args():
 
 
 def get_pseudowords(line):
-    for char in line:
-        if char in "\n?!/:'":
-            line = line.replace(char,'')
-    real_words = line.lower().split(";")[2].split()
+    real_words = line.split(";")[2].split()
     pseudowords = []
 
-    for word in real_words:
-        query_term = word.replace(",", "").replace(".", "")           
+    for word in real_words:   
         try:
+            # Try to get pseudoword
+            query_term = re.sub(",|\.|\?", "", word).lower()
             results = g.generate_classic([query_term])
+
             # Append a random pseudoword from the results
             if results != None and len(results) > 0:
                 n = random.randint(0, len(results)-1)
-                if "," in word:
-                    pseudowords.append(results[n]['pseudoword'] + ",")
-                elif "." in word:
-                    pseudowords.append(results[n]['pseudoword'] + ".")
-                else:
-                    pseudowords.append(results[n]['pseudoword'])
+                pseudoword = results[n]['pseudoword']
+
+                # If real word had first letter caps, pseudoword should
+                if word[0].isupper():
+                    pseudoword = pseudoword.capitalize()
+
+                # If real word had punctuation, pseudoword should
+                if pseudoword[-1] not in [".", ",", "?", "!"] and word[-1] in [".", ",", "?", "!"]:
+                    pseudoword += word[-1]
+                
+                pseudowords.append(pseudoword)
             else:
-                pseudowords.append(word.upper()) 
+                pseudowords.append(word.upper())
 
         except Exception as e:
             if "not found in lexicon" in str(e):
                 pseudowords.append(word.upper())      
             print("Exception: " + str(e))
-        
     
+    pseudowords[0] = "x-x-x"
+
+    # Python check
     if len(pseudowords) != len(real_words):
-        print("ERROR Length of pseudowords not the same as length of real words for line: " + line)
+        print("ERROR-PY Length of pseudowords not the same as length of real words for lines:")
+        print(pseudoword)
+        print(real_words)
+        exit()
+
+    # Ibex Javascript check
+    merged_pseudo = " ".join(pseudowords)
+    merged_real = " ".join(real_words)
+
+    x = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_pseudo).split(r"[ \t]+")
+    y = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_real).split(r"[ \t]+")
+
+    if len(x) != len(y):
+        print("ERROR-JS Length of pseudowords not the same as length of real words for lines:")
+        print(x)
+        print(y)
         exit()
 
     return pseudowords
-
 
 def output_ibex(out_file, lines):
     with open(out_file, "w", encoding="utf-8") as f:
@@ -68,11 +89,7 @@ def output_ibex(out_file, lines):
             exp_name  = s[0]
             item_num = s[1]
             real_sentence = s[2]
-            
-            if len(s[3].split()) > 1:
-                distractor_sentence = " ".join((s[3]).split())
-            else:
-                distractor_sentence = s[3]
+            distractor_sentence = s[3]
 
             f.write((f"[[\"{exp_name}\", {item_num}], \"Maze\", {{s:\"{real_sentence}\", a:\"{distractor_sentence}\"}}],\n"))
 
@@ -98,10 +115,10 @@ if __name__ == '__main__':
         
         # Get pseudowords for each line
         for line in lines:
-            line = line + ";"
-            for pseudoword in get_pseudowords(line):
-                line = line.replace("\n", "") + pseudoword + " "
-            new_lines.append(line.strip())
+            pseudowords_list = get_pseudowords(line)
+            pseudowords_string = " ".join(pseudowords_list)
+            line = line.strip() + ";" + pseudowords_string
+            new_lines.append(line)
         
     # Output to Ibex format
     output_ibex(args.out_file, new_lines)
