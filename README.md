@@ -13,7 +13,7 @@ First, open a terminal window and navigate to the folder where `l_maze.py` is lo
 `python l_maze.py`
 
 This runs the script with default parameters, meaning it will run the script on the included `example.txt` file.
-You should see teh sentence outputs of the program in your terminal window.
+You should see the sentence outputs of the program in your terminal window.
 
 ## Running With Your Items
 To run with custom parameters (i.e., your items), use the following template:
