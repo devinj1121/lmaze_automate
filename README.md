@@ -27,15 +27,15 @@ The parameters serve the following functions:
 - lang (default = EN): String specifying input language. Only English is functioning at the moment.
 
 These parameters are not mandatory, so if you just want to run with your items but keep the default output file name and
-lang EN, you can just specify the input file parameter. **NOTE**, your input must be formatted as `[condition];[item];[sentence]`. 
+lang EN, you can just specify the input file parameter. **NOTE**, each line must be formatted as ``[condition];[item];[sentence]``. 
 For example, if you have a 2x2 factorial experiment, the first few lines may look like so:
 
-`condition-a;item1;blabla bla
- condition-b;item1;blaaaa bla
- condition-c;item1;blooo bla
- condition-d;item1;blooombloa
- condition-a;item2;fooofaaa
- .....
- .....`
+``condition-a;item1;blabla bla  
+ condition-b;item1;blaaaa bla  
+ condition-c;item1;blooo bla  
+ condition-d;item1;blooombloa  
+ condition-a;item2;fooofaaa  
+ .....  
+ .....``  
 
 In addition, your file **must have no headings**.
