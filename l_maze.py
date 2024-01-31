@@ -18,7 +18,7 @@ def parse_args():
         - args (argparse.Namespace): The list of arguments passed in
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "items_raw.txt")
+    parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "example.txt")
     parser.add_argument("-out_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "./items_ibex.txt")
     parser.add_argument("-lang",type=str, help = "Language of input/pseudowords", default = "EN")
     args = parser.parse_args()
@@ -82,6 +82,7 @@ def get_pseudowords(line):
 
     return pseudowords
 
+
 def output_ibex(out_file, lines):
     with open(out_file, "w", encoding="utf-8") as f:
         for line in lines:
@@ -105,7 +106,7 @@ if __name__ == '__main__':
         quit()
 
     new_lines = []
-    with open(args.input_file, "r", encoding="utf-8") as f:
+    with open(args.input_file, "r", encoding="utf-8-sig") as f:
         # Check that the line is right format.
         # NOTE: This is not a comprehensive format check - please check that your lines are formatted as such: expname_cond;item#;sentence
         lines = f.readlines()
@@ -113,13 +114,28 @@ if __name__ == '__main__':
             print("Error: Improper stimuli formatting. Please format sentences as follows and ensure no headings on text file. expname_cond;item#;sentence")
             quit()
         
-        # Get pseudowords for each line
+        # Get pseudowords for each item set
+        last_item = 0
+        last_pseudo = []
         for line in lines:
-            pseudowords_list = get_pseudowords(line)
-            pseudowords_string = " ".join(pseudowords_list)
-            line = line.strip() + ";" + pseudowords_string.strip()
-            print(line)
+
+            # Want pseudowords to be same for all conditions of an item
+            curr_item = int(line.split(";")[0])
+
+            # If it's a new item, generate, otherwise use last pseudowords
+            if curr_item != last_item:
+                curr_pseudo = get_pseudowords(line)
+            else:
+                curr_pseudo = last_pseudo
+
+            # Make the line for txt output
+            line = line.strip() + ";" + " ".join(curr_pseudo).strip()
             new_lines.append(line)
+            print(line)
+
+            # Update "last" variales
+            last_pseudo = curr_pseudo
+            last_item = curr_item
         
     # Output to Ibex format
     output_ibex(args.out_file, new_lines)
