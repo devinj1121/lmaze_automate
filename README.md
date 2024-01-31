@@ -26,4 +26,7 @@ The parameters serve the following functions:
 - output_file (default = ./items_ibex.txt/): String specifying where output will be stored.
 - lang (default = EN): String specifying input language. Only English is functioning at the moment.
 
+These parameters are not mandatory, so if you just want to run with your items but keep the default output file name and
+lang EN, you can just specify the input file parameter.
+
 NOTE: Your input must be formatted as condition;item#;sentence. In addition, your file must have no headings. Refer to the example provided as reference.
