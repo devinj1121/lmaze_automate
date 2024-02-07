@@ -121,7 +121,7 @@ if __name__ == '__main__':
         for line in lines:
 
             # Want pseudowords to be same for all conditions of an item
-            curr_item = int(line.split(";")[0])
+            curr_item = int(line.split(";")[1])
 
             # If it's a new item, generate, otherwise use last pseudowords
             if curr_item != last_item:
