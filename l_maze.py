@@ -58,7 +58,8 @@ def get_pseudowords(line):
                 pseudowords.append(word.upper())      
             print("Exception: " + str(e))
     
-    pseudowords[0] = "x-x-x"
+    # If you want first distractor to be x-x-x instead of pseudoword, uncomment.
+    # pseudowords[0] = "x-x-x"
 
     # Python check
     if len(pseudowords) != len(real_words):
