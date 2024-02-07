@@ -31,7 +31,7 @@ lang EN, you can just specify the input file parameter.
 
  **NOTE** each line must be formatted as: 
 
-```[condition];[item];[sentence]```
+```[item];[condition];[sentence]```
 
 
 For example, if you have a 2x2 factorial experiment, the first few lines may look like so:
