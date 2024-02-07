@@ -31,17 +31,17 @@ lang EN, you can just specify the input file parameter.
 
  **NOTE** each line must be formatted as: 
 
-```[item];[condition];[sentence]```
+```[condition];[item];[sentence]```
 
 
 For example, if you have a 2x2 factorial experiment, the first few lines may look like so:
 
 ```
-item1;condition-a;blabla bla
-item1;condition-b;blaaaa bla
-item1;condition-c;blooo bla
-item1;condition-d;blooombloa
-item2;condition-a;fooofaaa
+condition-a;item1;blabla bla
+condition-b;item1;blaaaa bla
+condition-c;item1;blooo bla
+condition-d;item1;blooombloa
+condition-a;item2;fooofaaa
 .....
 .....
 ```
