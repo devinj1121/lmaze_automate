@@ -88,12 +88,12 @@ def output_ibex(out_file, lines):
     with open(out_file, "w", encoding="utf-8") as f:
         for line in lines:
             s = line.split(";")
-            exp_name  = s[0]
+            condition  = s[0]
             item_num = s[1]
             real_sentence = s[2]
             distractor_sentence = s[3]
 
-            f.write((f"[[\"{exp_name}\", {item_num}], \"Maze\", {{s:\"{real_sentence}\", a:\"{distractor_sentence}\"}}],\n"))
+            f.write((f"[[\"{condition}\", {item_num}], \"Maze\", {{s:\"{real_sentence}\", a:\"{distractor_sentence}\"}}],\n"))
 
 
 if __name__ == '__main__':
@@ -109,10 +109,10 @@ if __name__ == '__main__':
     new_lines = []
     with open(args.input_file, "r", encoding="utf-8-sig") as f:
         # Check that the line is right format.
-        # NOTE: This is not a comprehensive format check - please check that your lines are formatted as such: expname_cond;item#;sentence
+        # NOTE: This is not a comprehensive format check - please check that your lines are formatted as such: condition;item#;sentence
         lines = f.readlines()
         if len(lines[0].split(";")) != 3:
-            print("Error: Improper stimuli formatting. Please format sentences as follows and ensure no headings on text file. expname_cond;item#;sentence")
+            print("Error: Improper stimuli formatting. Please format sentences as follows and ensure no headings on text file. condition;item#;sentence")
             quit()
         
         # Get pseudowords for each item set
@@ -134,7 +134,7 @@ if __name__ == '__main__':
             new_lines.append(line)
             print(line)
 
-            # Update "last" variales
+            # Update "last" variables
             last_pseudo = curr_pseudo
             last_item = curr_item
         
