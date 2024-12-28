@@ -1,6 +1,6 @@
 # lmaze_automate
 
-Generates pseudoword distractors for the Lmaze experimental methodology using
+Generates pseudoword distractors for L-Maze experiments using
 [Wuggy](https://github.com/WuggyCode/wuggy) in Python. Outputs are generated in format
 which is ready to use in PCIbex.
 
