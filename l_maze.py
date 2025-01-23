@@ -8,6 +8,8 @@ import random
 import re
 from wuggy import WuggyGenerator
 
+language = None
+japanese_shuffle = None
 
 def parse_args():
     """
@@ -18,45 +20,89 @@ def parse_args():
         - args (argparse.Namespace): The list of arguments passed in
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "example.txt")
-    parser.add_argument("-out_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "./items_ibex.txt")
-    parser.add_argument("-lang",type=str, help = "Language of input/pseudowords", default = "EN")
+    parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "example-en.txt")
+    parser.add_argument("-output_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "./items_ibex.txt")
+    parser.add_argument("-lang",type=str, help = "Language of input; en for English; ja for Japanese.", default = "en")
+    parser.add_argument("-japanese_shuffle",type=int, help = "Types of pseudoword generations (only valid for Japanese); 0 for random shuffle of each token; 1 for random shift of end-of-phrase particle (like が・は, etc.) ", default = 0)
+
     args = parser.parse_args()
+
+    global language
+    language = args.lang.lower()
     
+    global japanese_shuffle
+    japanese_shuffle = args.japanese_shuffle
+
     return args
 
-
-def get_pseudowords(line):
+def get_pseudowords(line, language, mode):
+    # Let a word be defined as a space-separated token in the input
+    # Ex. "I like pizza" has three words; 「その学生が　ピザを　食べた。」also has three words.
     real_words = line.split(";")[2].split()
     pseudowords = []
 
-    for word in real_words:   
-        try:
-            # Try to get pseudoword
-            query_term = re.sub(",|\.|\?", "", word).lower()
-            results = g.generate_classic([query_term])
+    for word in real_words:
+        
+        if language == "en":
+            try:
+                # Try to get pseudoword
+                query_term = re.sub(r",|\.|\?", "", word).lower()
+                results = g.generate_classic([query_term])
 
-            # Append a random pseudoword from the results
-            if results != None and len(results) > 0:
-                n = random.randint(0, len(results)-1)
-                pseudoword = results[n]['pseudoword']
+                # Append a random pseudoword from the results
+                if results != None and len(results) > 0:
+                    n = random.randint(0, len(results)-1)
+                    pseudoword = results[n]['pseudoword']
 
-                # If real word had first letter caps, pseudoword should
-                if word[0].isupper():
-                    pseudoword = pseudoword.capitalize()
+                    # If real word had first letter caps, pseudoword should
+                    if word[0].isupper():
+                        pseudoword = pseudoword.capitalize()
 
-                # If real word had punctuation, pseudoword should
-                if pseudoword[-1] not in [".", ",", "?", "!"] and word[-1] in [".", ",", "?", "!"]:
-                    pseudoword += word[-1]
-                
-                pseudowords.append(pseudoword)
+                    # If real word had punctuation, pseudoword should
+                    if pseudoword[-1] not in [".", ",", "?", "!"] and word[-1] in [".", ",", "?", "!"]:
+                        pseudoword += word[-1]
+                    
+                    pseudowords.append(pseudoword)
+                else:
+                    pseudowords.append(word.upper())
+
+            except Exception as e:
+                if "not found in lexicon" in str(e):
+                    pseudowords.append(word.upper())      
+                print("Exception caught: " + str(e))
+            
+        if language == "ja":
+            
+            # Handle ending punctuation
+            end_punctuation = ""
+
+            if "。" in word or "？" in word:
+                end_punctuation = word[-1]
+                word = list(word)[0:-1]
             else:
-                pseudowords.append(word.upper())
+                word = list(word)
+            
+            # Random shuffle mode
+            if mode == 0:
+                word_c = word.copy()
+                while(word_c == word): 
+                   random.shuffle(word_c)
+                word = word_c
+                
+            # Move end particle mode
+            elif mode == 1:
+                if len(word) <= 2:
+                    temp = word[0]
+                    word[0] = word[-1]
+                    word[-1] = temp
+                else:
+                    targeti = random.randint(0, len(word)-2)
+                    temp = word[targeti]
+                    word[targeti] = word[-1]
+                    word[-1] = temp
 
-        except Exception as e:
-            if "not found in lexicon" in str(e):
-                pseudowords.append(word.upper())      
-            print("Exception: " + str(e))
+            word = "".join(word) + end_punctuation
+            pseudowords.append(word)
     
     # If you want first distractor to be x-x-x instead of pseudoword, uncomment.
     # pseudowords[0] = "x-x-x"
@@ -64,7 +110,7 @@ def get_pseudowords(line):
     # Python check
     if len(pseudowords) != len(real_words):
         print("ERROR-PY Length of pseudowords not the same as length of real words for lines:")
-        print(pseudoword)
+        print(pseudowords)
         print(real_words)
         exit()
 
@@ -83,9 +129,8 @@ def get_pseudowords(line):
 
     return pseudowords
 
-
-def output_ibex(out_file, lines):
-    with open(out_file, "w", encoding="utf-8") as f:
+def output_ibex(output_file, lines):
+    with open(output_file, "w", encoding="utf-8") as f:
         for line in lines:
             s = line.split(";")
             condition  = s[0]
@@ -93,17 +138,18 @@ def output_ibex(out_file, lines):
             real_sentence = s[2]
             distractor_sentence = s[3]
 
-            f.write((f"[[\"{condition}\", {item_num}], \"Maze\", {{s:\"{real_sentence}\", a:\"{distractor_sentence}\"}}],\n"))
-
+            f.write((f"[[\"{condition}\", \'{item_num}\'], \"Maze\", {{s:\"{real_sentence}\", a:\"{distractor_sentence}\"}}],\n"))
 
 if __name__ == '__main__':
 
     args = parse_args()
     g = WuggyGenerator()
-    if args.lang == "EN":
+    if args.lang.lower() == "en":
         g.load("orthographic_english")
+    elif args.lang.lower() == "ja":
+        pass
     else:
-        print("Error: Currently no support for non-English - stopping the program.")
+        print("Error: Current support only for English (en) and Japanese (ja).")
         quit()
 
     new_lines = []
@@ -120,15 +166,14 @@ if __name__ == '__main__':
         last_pseudo = []
         for line in lines:
 
-            # Want pseudowords to be same for all conditions of an item
+            # Want distractors to be same for all conditions of an item (except at manipulated regions)
+            # TODO: Do I want this? If so, need to make exception for manipulated regions
             curr_item = int(line.split(";")[1])
-
-            # If it's a new item, generate, otherwise use last pseudowords
-            if curr_item != last_item:
-                curr_pseudo = get_pseudowords(line)
-            else:
-                curr_pseudo = last_pseudo
-
+            # if curr_item == last_item:
+            #     curr_pseudo = last_pseudo
+            # else: 
+            curr_pseudo = get_pseudowords(line, language, japanese_shuffle)
+                
             # Make the line for txt output
             line = line.strip() + ";" + " ".join(curr_pseudo).strip()
             new_lines.append(line)
@@ -139,4 +184,4 @@ if __name__ == '__main__':
             last_item = curr_item
         
     # Output to Ibex format
-    output_ibex(args.out_file, new_lines)
+    output_ibex(args.output_file, new_lines)
