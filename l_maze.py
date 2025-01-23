@@ -35,78 +35,81 @@ def parse_args():
 
     return args
 
-def get_pseudowords(line, language, mode):
+def get_pseudowords(line, item_dict):
     # Let a word be defined as a space-separated token in the input
     # Ex. "I like pizza" has three words; 「その学生が　ピザを　食べた。」also has three words.
     real_words = line.split(";")[2].split()
     pseudowords = []
 
-    for word in real_words:
-        
-        if language == "en":
-            try:
-                # Try to get pseudoword
-                query_term = re.sub(r",|\.|\?", "", word).lower()
-                results = g.generate_classic([query_term])
+    for real_word in real_words:
 
-                # Append a random pseudoword from the results
-                if results != None and len(results) > 0:
-                    n = random.randint(0, len(results)-1)
-                    pseudoword = results[n]['pseudoword']
+        # If already generated a pseudoword for this word (i.e., still on the same item), just use that one
+        if real_word in item_dict:
+            pseudowords.append(item_dict[real_word])
+        else:
+            if language == "en":
+                try:
+                    # Try to get pseudoword
+                    query_term = re.sub(r",|\.|\?", "", real_word).lower()
+                    results = g.generate_classic([query_term])
+     
+                    if len(results) > 0:
+                        # Append a random pseudoword from the results                    
+                        n = random.randint(0, len(results)-1)
+                        pseudoword = results[n]['pseudoword']
 
-                    # If real word had first letter caps, pseudoword should
-                    if word[0].isupper():
-                        pseudoword = pseudoword.capitalize()
+                        #  Handle punctuation and caps
+                        if real_word[0].isupper():
+                            pseudoword = pseudoword.capitalize()
+                        if pseudoword[-1] not in [".", ",", "?", "!"] and real_word[-1] in [".", ",", "?", "!"]:
+                            pseudoword += real_word[-1]
+                        
+                        pseudowords.append(pseudoword)
+                        item_dict[real_word] = pseudoword
+                    # Can return empty, for example, on 1 letter words
+                    else: 
+                        pseudowords.append(real_word.upper())   
+                        item_dict[real_word] = real_word.upper()   
 
-                    # If real word had punctuation, pseudoword should
-                    if pseudoword[-1] not in [".", ",", "?", "!"] and word[-1] in [".", ",", "?", "!"]:
-                        pseudoword += word[-1]
+                except Exception as e:
+                    if "not found in lexicon" in str(e):
+                        pseudowords.append(real_word.upper())   
+                        item_dict[real_word] = real_word.upper()   
+                    print("Exception caught: " + str(e))
                     
-                    pseudowords.append(pseudoword)
+            if language == "ja":
+                # Handle ending punctuation
+                end_punctuation = ""
+
+                if "。" in real_word or "？" in real_word:
+                    end_punctuation = real_word[-1]
+                    pseudoword = list(real_word)[0:-1]
                 else:
-                    pseudowords.append(word.upper())
-
-            except Exception as e:
-                if "not found in lexicon" in str(e):
-                    pseudowords.append(word.upper())      
-                print("Exception caught: " + str(e))
-            
-        if language == "ja":
-            
-            # Handle ending punctuation
-            end_punctuation = ""
-
-            if "。" in word or "？" in word:
-                end_punctuation = word[-1]
-                word = list(word)[0:-1]
-            else:
-                word = list(word)
-            
-            # Random shuffle mode
-            if mode == 0:
-                word_c = word.copy()
-                while(word_c == word): 
-                   random.shuffle(word_c)
-                word = word_c
+                    pseudoword = list(real_word)
                 
-            # Move end particle mode
-            elif mode == 1:
-                if len(word) <= 2:
-                    temp = word[0]
-                    word[0] = word[-1]
-                    word[-1] = temp
-                else:
-                    targeti = random.randint(0, len(word)-2)
-                    temp = word[targeti]
-                    word[targeti] = word[-1]
-                    word[-1] = temp
+                # Random shuffle mode
+                if japanese_shuffle == 0:
+                    word_c = pseudoword.copy()
+                    while(word_c == pseudoword): 
+                        random.shuffle(word_c)
+                        pseudoword = word_c
+                    
+                # Move end particle mode
+                elif japanese_shuffle == 1:
+                    if len(pseudoword) <= 2:
+                        temp = pseudoword[0]
+                        pseudoword[0] = pseudoword[-1]
+                        pseudoword[-1] = temp
+                    else:
+                        targeti = random.randint(0, len(pseudoword)-2)
+                        temp = pseudoword[targeti]
+                        pseudoword[targeti] = pseudoword[-1]
+                        pseudoword[-1] = temp
 
-            word = "".join(word) + end_punctuation
-            pseudowords.append(word)
-    
-    # If you want first distractor to be x-x-x instead of pseudoword, uncomment.
-    # pseudowords[0] = "x-x-x"
-
+                pseudoword = "".join(pseudoword) + end_punctuation
+                pseudowords.append(pseudoword)
+                item_dict[real_word] = pseudoword 
+                
     # Python check
     if len(pseudowords) != len(real_words):
         print("ERROR-PY Length of pseudowords not the same as length of real words for lines:")
@@ -120,14 +123,13 @@ def get_pseudowords(line, language, mode):
 
     x = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_pseudo).split(r"[ \t]+")
     y = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_real).split(r"[ \t]+")
-
     if len(x) != len(y):
         print("ERROR-JS Length of pseudowords not the same as length of real words for lines:")
         print(x)
         print(y)
         exit()
 
-    return pseudowords
+    return pseudowords, item_dict
 
 def output_ibex(output_file, lines):
     with open(output_file, "w", encoding="utf-8") as f:
@@ -163,25 +165,22 @@ if __name__ == '__main__':
         
         # Get pseudowords for each item set
         last_item = 0
-        last_pseudo = []
+        item_dict = {}
         for line in lines:
 
             # Want distractors to be same for all conditions of an item (except at manipulated regions)
-            # TODO: Do I want this? If so, need to make exception for manipulated regions
             curr_item = int(line.split(";")[1])
-            # if curr_item == last_item:
-            #     curr_pseudo = last_pseudo
-            # else: 
-            curr_pseudo = get_pseudowords(line, language, japanese_shuffle)
+            
+            # Upon new item, reset dict and generate all new
+            if curr_item != last_item:
+                item_dict = {}
+            curr_pseudo, item_dict = get_pseudowords(line, item_dict)
+            last_item = curr_item
                 
             # Make the line for txt output
             line = line.strip() + ";" + " ".join(curr_pseudo).strip()
             new_lines.append(line)
             print(line)
-
-            # Update "last" variables
-            last_pseudo = curr_pseudo
-            last_item = curr_item
         
     # Output to Ibex format
     output_ibex(args.output_file, new_lines)
