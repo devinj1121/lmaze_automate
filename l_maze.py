@@ -21,7 +21,7 @@ def parse_args():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "example-en.txt")
-    parser.add_argument("-output_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "./items_ibex.txt")
+    parser.add_argument("-output_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "./example-en-out.txt")
     parser.add_argument("-lang",type=str, help = "Language of input; en for English; ja for Japanese.", default = "en", choices=["en","ja"])
     parser.add_argument("-ja_shuffle",type=int, help = "Types of pseudoword generations (only valid for Japanese); 0 for random shuffle of each token; 1 for random shift of end-of-phrase particle (like が・は, etc.) ", default = 0, choices=[0,1])
 
