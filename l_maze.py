@@ -9,7 +9,7 @@ import re
 from wuggy import WuggyGenerator
 
 language = None
-japanese_shuffle = None
+ja_shuffle = None
 
 def parse_args():
     """
@@ -22,16 +22,16 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "example-en.txt")
     parser.add_argument("-output_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "./items_ibex.txt")
-    parser.add_argument("-lang",type=str, help = "Language of input; en for English; ja for Japanese.", default = "en")
-    parser.add_argument("-japanese_shuffle",type=int, help = "Types of pseudoword generations (only valid for Japanese); 0 for random shuffle of each token; 1 for random shift of end-of-phrase particle (like が・は, etc.) ", default = 0)
+    parser.add_argument("-lang",type=str, help = "Language of input; en for English; ja for Japanese.", default = "en", choices=["en","ja"])
+    parser.add_argument("-ja_shuffle",type=int, help = "Types of pseudoword generations (only valid for Japanese); 0 for random shuffle of each token; 1 for random shift of end-of-phrase particle (like が・は, etc.) ", default = 0, choices=[0,1])
 
     args = parser.parse_args()
 
     global language
     language = args.lang.lower()
     
-    global japanese_shuffle
-    japanese_shuffle = args.japanese_shuffle
+    global ja_shuffle
+    ja_shuffle = args.ja_shuffle
 
     return args
 
@@ -88,14 +88,14 @@ def get_pseudowords(line, item_dict):
                     pseudoword = list(real_word)
                 
                 # Random shuffle mode
-                if japanese_shuffle == 0:
+                if ja_shuffle == 0:
                     word_c = pseudoword.copy()
                     while(word_c == pseudoword): 
                         random.shuffle(word_c)
                         pseudoword = word_c
                     
                 # Move end particle mode
-                elif japanese_shuffle == 1:
+                elif ja_shuffle == 1:
                     if len(pseudoword) <= 2:
                         temp = pseudoword[0]
                         pseudoword[0] = pseudoword[-1]
