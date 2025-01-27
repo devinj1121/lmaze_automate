@@ -17,7 +17,7 @@ Generates pseudoword distractors for L-Maze experiments using both
 - Packages required by [Wuggy](https://github.com/WuggyCode/wuggy) (available via pip)
 
 # Running an Example
-First clone the Github repository to your local machine using `git clone https://github.com/devinj1121/lmaze_automate.git`. Before running, you may examine the included example outputs in the `example_outputs` folder. Compare these with the corresponding input files to get an idea of how the program should work. To verify that the program runs correctly, first open a terminal window and navigate to the folder where `l_maze.py` is located. Then type and run:
+First clone the Github repository to your local machine using `git clone https://github.com/devinj1121/lmaze_automate.git`. Before running, you may examine the included example outputs in the `examples` folder. Compare these with the corresponding input files to get an idea of how the program should work. To verify that the program runs correctly, first open a terminal window and navigate to the folder where `l_maze.py` is located. Then type and run:
 
 `python l_maze.py`
 
