@@ -47,14 +47,14 @@ Each line must be formatted as:
 
 ```[condition];[item];[sentence]```
 
-For example, if you have a 2x2 factorial design, the first few lines may look like so:
+For example, if you have a 2x2 factorial design (four conditions - a,b,c,d), the first few lines may look like so:
 
 ```
-condition-a;item1;blabla bla
-condition-b;item1;blaaaa bla
-condition-c;item1;blooo bla
-condition-d;item1;blooombloa
-condition-a;item2;blabla bla
+exp1-a;item1;blabla bla
+exp1-b;item1;blaaaa bla
+exp1-c;item1;blooo bla
+exp1-d;item1;blooombloa
+exp1-a;item2;blabla bla
 .....
 .....
 ```
@@ -69,3 +69,14 @@ Keep the following in mind:
 
 ## Common Errors
 1. `Exception caught: Sequence ... was not found in lexicon orthographic_english`: This error means that Wuggy was not able to make a distractor for the given word. This can happen quite often. In this case, the program will insert the original word in CAPS to the output file. You will then need to replace these manually by searching with Ctrl+F for capital words in the output file.
+
+
+2. `IndexError: list index out of range`: If you receive the error below, most likely you have empty lines in your input file. Make sure to delete any empty lines and that your file only contains lines with the proper formatting of `condition;item#;sentence`.
+
+```
+Traceback (most recent call last):
+  File ".../l_maze.py", line 196, in <module>
+    curr_item = int(line.split(";")[1])
+                    ~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+```

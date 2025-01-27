@@ -1,6 +1,6 @@
 """
 Generate L-maze items in ibex format from standard-formatted text file of stimuli.
-Author: Devin Johnson
+Author: Devin Johnson (devinj1121@gmail.com)
 Latest Update: January, 2025
 """
 
@@ -123,13 +123,28 @@ def get_pseudowords(line, item_dict):
                     
                 # Move end particle mode
                 elif ja_shuffle == 1:
-                    if len(pseudoword) <= 2:
+                    if len(pseudoword) == 1:
+                        replace = pseudoword[0]
+                        while replace == pseudoword[0]:
+                            replace = random.choice(["あ","い","う","お","え"])
+                        pseudoword[0] = replace
+                    elif len(pseudoword) == 2:
+                        # Handle cases like いい
+                        while pseudoword[0] == pseudoword[1]:
+                            pseudoword[1] = random.choice(["あ","い","う","お","え"])
+                        # Make swap
                         temp = pseudoword[0]
                         pseudoword[0] = pseudoword[-1]
                         pseudoword[-1] = temp
                     else:
-                        targeti = random.randint(0, len(pseudoword)-2)
+                        # Set target to be same as last char, to start
+                        targeti = -1
                         temp = pseudoword[targeti]
+                        # Keep generating new target until find one that's not the same char (want to avoid swap of same chars)
+                        while temp == pseudoword[-1]:
+                            targeti = random.randint(0, len(pseudoword)-2)
+                            temp = pseudoword[targeti]
+                        # Make the swap                                                
                         pseudoword[targeti] = pseudoword[-1]
                         pseudoword[-1] = temp
 

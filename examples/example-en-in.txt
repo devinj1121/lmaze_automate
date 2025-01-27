@@ -1,8 +1,8 @@
-﻿a;1;Which developer's idea to create himself a website do the clients think that the manager likes most?
-b;1;Which developer's idea to create John a website do the clients think that the manager likes most?
-c;1;Which innovative idea to create himself a website do the clients think that the manager likes most?
-d;1;Which innovative idea to create John a website do the clients think that the manager likes most?
-a;2;Which designer's strategy to design herself a logo do the stakeholders think that the programmer appreciates most?
-b;2;Which designer's strategy to design Maria a logo do the stakeholders think that the programmer appreciates most?
-c;2;Which creative strategy to design herself a logo do the stakeholders think that the programmer appreciates most?
-d;2;Which creative strategy to design Maria a logo do the stakeholders think that the programmer appreciates most?
+﻿exp1-a;1;Which developer's idea to create himself a website do the clients think that the manager likes most?
+exp1-b;1;Which developer's idea to create John a website do the clients think that the manager likes most?
+exp1-c;1;Which innovative idea to create himself a website do the clients think that the manager likes most?
+exp1-d;1;Which innovative idea to create John a website do the clients think that the manager likes most?
+exp1-a;2;Which designer's strategy to design herself a logo do the stakeholders think that the programmer appreciates most?
+exp1-b;2;Which designer's strategy to design Maria a logo do the stakeholders think that the programmer appreciates most?
+exp1-c;2;Which creative strategy to design herself a logo do the stakeholders think that the programmer appreciates most?
+exp1-d;2;Which creative strategy to design Maria a logo do the stakeholders think that the programmer appreciates most?
