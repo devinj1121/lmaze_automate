@@ -57,14 +57,14 @@ Each line must be formatted as:
 For example, if you have a 2x2 factorial design (four conditions - a,b,c,d), the first few lines may look like so:
 
 ```
-exp1-a;item1;blabla bla
-exp1-b;item1;blaaaa bla
-exp1-c;item1;blooo bla
-exp1-d;item1;blooombloa
-exp1-a;item2;blabla bla
-exp1-b;item2;blabla booo
-exp1-c;item2;blabla boomboom
-exp1-d;item2;blabla blooom
+exp1-a;1;blabla bla
+exp1-b;1;blaaaa bla
+exp1-c;1;blooo bla
+exp1-d;1;blooombloa
+exp1-a;2;blabla bla
+exp1-b;2;blabla booo
+exp1-c;2;blabla boomboom
+exp1-d;2;blabla blooom
 .....
 .....
 ```
