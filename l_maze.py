@@ -1,6 +1,7 @@
 """
 Generate L-maze items in ibex format from standard-formatted text file of stimuli.
-Author: Devin Johnson, 2022
+Author: Devin Johnson
+Latest Update: January, 2025
 """
 
 import argparse
@@ -20,8 +21,8 @@ def parse_args():
         - args (argparse.Namespace): The list of arguments passed in
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "example-en.txt")
-    parser.add_argument("-output_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "./example-en-out.txt")
+    parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "examples/example-en-in.txt")
+    parser.add_argument("-output_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "examples/example-en-out.txt")
     parser.add_argument("-lang",type=str, help = "Language of input; en for English; ja for Japanese.", default = "en", choices=["en","ja"])
     parser.add_argument("-ja_shuffle",type=int, help = "Types of pseudoword generations (only valid for Japanese); 0 for random shuffle of each token; 1 for random shift of end-of-phrase particle (like が・は, etc.) ", default = 0, choices=[0,1])
 
@@ -35,13 +36,39 @@ def parse_args():
 
     return args
 
+def check(realwords, pseudowords):
+    # 1: Same amount of real and pseudo before merging lists
+    if len(pseudowords) != len(realwords):
+        print("ERROR-LIST Length of pseudowords not the same as length of real words for lines:")
+        print(pseudowords)
+        print(realwords)
+        exit()
+    else:
+        # 2: Make sure no real words match pseudowords
+        for i in range(len(pseudowords)):
+            if pseudowords[i] == realwords[i]:
+                print("ERROR-LIST Some real word(s) match some pseudoword(s):")
+                print(pseudowords)
+                print(realwords)
+                exit()
+    # 3: Same length after merging lists into strings
+    merged_pseudo = " ".join(pseudowords)
+    merged_real = " ".join(realwords)
+    x = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_pseudo).split(r"[ \t]+")
+    y = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_real).split(r"[ \t]+")
+    if len(x) != len(y):
+        print("ERROR-MERGE Length of pseudowords not the same as length of real words for lines:")
+        print(x)
+        print(y)
+        exit()
+
 def get_pseudowords(line, item_dict):
     # Let a word be defined as a space-separated token in the input
     # Ex. "I like pizza" has three words; 「その学生が　ピザを　食べた。」also has three words.
-    real_words = line.split(";")[2].split()
+    realwords = line.split(";")[2].split()
     pseudowords = []
 
-    for real_word in real_words:
+    for real_word in realwords:
 
         # If already generated a pseudoword for this word (i.e., still on the same item), just use that one
         if real_word in item_dict:
@@ -109,26 +136,8 @@ def get_pseudowords(line, item_dict):
                 pseudoword = "".join(pseudoword) + end_punctuation
                 pseudowords.append(pseudoword)
                 item_dict[real_word] = pseudoword 
-                
-    # Python check
-    if len(pseudowords) != len(real_words):
-        print("ERROR-PY Length of pseudowords not the same as length of real words for lines:")
-        print(pseudowords)
-        print(real_words)
-        exit()
-
-    # Ibex Javascript check
-    merged_pseudo = " ".join(pseudowords)
-    merged_real = " ".join(real_words)
-
-    x = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_pseudo).split(r"[ \t]+")
-    y = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_real).split(r"[ \t]+")
-    if len(x) != len(y):
-        print("ERROR-JS Length of pseudowords not the same as length of real words for lines:")
-        print(x)
-        print(y)
-        exit()
-
+    
+    check(realwords, pseudowords)
     return pseudowords, item_dict
 
 def output_ibex(output_file, lines):
