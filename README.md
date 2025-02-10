@@ -1,7 +1,7 @@
 # lmaze_automate
 
 Generates pseudoword distractors for L-Maze experiments using both
-[Wuggy](https://github.com/WuggyCode/wuggy) and custom methods. Outputs are generated in format which is ready to use in PCIbex. Current language support for English and Japanese.
+[Wuggy](https://github.com/WuggyCode/wuggy) and custom methods. Outputs are generated in format which is ready to use in PCIbex. Current language support for English, Japanese, and Russian.
 
 - [lmaze\_automate](#lmaze_automate)
 - [Requirements](#requirements)
@@ -73,7 +73,7 @@ Keep the following in mind:
 
 1. **File Type & Headings**: Your file must be a .txt file with no headings (e.g., like in CSV files).
 
-1. **Words**: The program treats each space-separated token in the sentence as a word, generating a distractor for each. In English, this is intuitive. In the first line of the example above, "blabla" and "bla" would thus be two separate words. However, for Japanese, what is treated as a word is more flexible to the experiment design. For example, it may be reasonable to treat a string like `その学生が` as one word. This would mean participants would be presented with the choice between `その学生が` and a generated distractor such as `そのが学生`.
+1. **Words**: The program treats each space-separated token in the sentence as a word, generating a distractor for each. In English and Russian, this is intuitive. In the first line of the example above, "blabla" and "bla" would thus be two separate words. However, for Japanese, what is treated as a word is more flexible to the experiment design. For example, it may be reasonable to treat a string like `その学生が` as one word. This would mean participants would be presented with the choice between `その学生が` and a generated distractor such as `そのが学生`.
 
 2. **Fixed Distractors**: Distractors are kept constant across the conditions of the same item. So, since item1 has "bla" in multiple conditions, the same distractor will be used. However, in item2, a new distractor for "bla" will be generated and used for any other instances of "bla" in item2.
 

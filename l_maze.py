@@ -8,6 +8,7 @@ import argparse
 import random
 import re
 from wuggy import WuggyGenerator
+from rusyll import rusyll
 
 language = None
 ja_shuffle = None
@@ -23,7 +24,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-input_file",type=str, help = "Full path to input file (txt).", default = "examples/example-en-in.txt")
     parser.add_argument("-output_file",type=str, help = "Full path to desired output file (l-maze/ibex format)", default = "examples/example-en-out.txt")
-    parser.add_argument("-lang",type=str, help = "Language of input; en for English; ja for Japanese.", default = "en", choices=["en","ja"])
+    parser.add_argument("-lang",type=str, help = "Language of input (en,ja,ru)", default = "en", choices=["en","ja","ru"])
     parser.add_argument("-ja_shuffle",type=int, help = "Types of pseudoword generations (only valid for Japanese); 0 for random shuffle of each token; 1 for random shift of end-of-phrase particle (like が・は, etc.) ", default = 0, choices=[0,1])
 
     args = parser.parse_args()
@@ -152,6 +153,39 @@ def get_pseudowords(line, item_dict):
                 pseudowords.append(pseudoword)
                 item_dict[real_word] = pseudoword 
     
+            if language == "ru":
+
+                # Handle punctuation
+                end_punctuation = ""
+                if "." in real_word or "," in real_word or "?" in real_word:
+                    end_punctuation = real_word[-1]
+                    real_word = list(real_word)[0:-1]
+                    real_word = "".join(real_word)
+                
+                # Only 1 char long
+                if len(real_word) == 1:
+                    pseudoword = real_word
+                    while pseudoword == real_word:
+                        pseudoword = random.choice(['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 
+                                           'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я'])
+                else:
+                    syllables = rusyll.token_to_syllables(real_word)
+                    # Shuffle the word itself if it's only 1 syllable (and longer than 1 char)
+                    if len(syllables) == 1:
+                        pseudoword = real_word
+                        while pseudoword == real_word:
+                            pseudoword = list(pseudoword)
+                            random.shuffle(pseudoword)
+                            pseudoword = "".join(pseudoword)
+                    else:
+                        while real_word == "".join(syllables):
+                            random.shuffle(syllables) 
+                        pseudoword = "".join(syllables) + end_punctuation 
+                
+                pseudoword = pseudoword.lower()
+                pseudowords.append(pseudoword)
+                item_dict[real_word] = pseudoword 
+
     check(realwords, pseudowords)
     return pseudowords, item_dict
 
@@ -170,13 +204,13 @@ if __name__ == '__main__':
 
     args = parse_args()
     g = WuggyGenerator()
-    if args.lang.lower() == "en":
-        g.load("orthographic_english")
-    elif args.lang.lower() == "ja":
-        pass
-    else:
+
+    if args.lang.lower() not in ["en", "ja", "ru"]:
         print("Error: Current support only for English (en) and Japanese (ja).")
         quit()
+    if args.lang.lower() == "en":
+        g.load("orthographic_english")
+       
 
     new_lines = []
     with open(args.input_file, "r", encoding="utf-8-sig") as f:
