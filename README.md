@@ -20,6 +20,10 @@ To install all the necessary packages at once, use:
 
 `pip install -r requirements.txt`
 
+Before installing requirements, you may need to create a Python virtual environment. This acts as a container
+that remembers what versions of Python packages you have. Ideally, each project you make with Python should therefore
+have its own virtual environment. You may read more [here](https://docs.python.org/3/library/venv.html).
+
 # Running an Example
 First get the files by clicking the `Code` button on the top right of Github and selected `Download Zip`. Or, you may clone the Github repository to your local machine using `git clone https://github.com/devinj1121/lmaze_automate.git`. Install all required Python packages using the command given in the requirements section above. Before running, you may examine the included example outputs in the `examples` folder. Compare these with the corresponding input files to get an idea of how the program should work. 
 
