@@ -1,7 +1,6 @@
 """
 Generate L-maze items in ibex format from standard-formatted text file of stimuli.
 Author: Devin Johnson (devinj1121@gmail.com)
-Latest Update: January, 2025
 """
 
 import argparse

@@ -14,17 +14,21 @@ Generates pseudoword distractors for L-Maze experiments using both
 
 # Requirements
 - [Python 3+](https://www.python.org/downloads/)
-- Packages required by [Wuggy](https://github.com/WuggyCode/wuggy) (available via pip)
+- Python packages listed in `requirements.txt`, installable via `pip`
+
+To install all the necessary packages at once, use:
+
+`pip install -r requirements.txt`
 
 # Running an Example
-First clone the Github repository to your local machine using `git clone https://github.com/devinj1121/lmaze_automate.git`. Before running, you may examine the included example outputs in the `examples` folder. Compare these with the corresponding input files to get an idea of how the program should work. To verify that the program runs correctly, first open a terminal window and navigate to the folder where `l_maze.py` is located. Then type and run:
+First get the files by clicking the `Code` button on the top right of Github and selected `Download Zip`. Or, you may clone the Github repository to your local machine using `git clone https://github.com/devinj1121/lmaze_automate.git`. Install all required Python packages using the command given in the requirements section above. Before running, you may examine the included example outputs in the `examples` folder. Compare these with the corresponding input files to get an idea of how the program should work. 
+
+
+To verify that the program runs correctly, after installing the required Python packages, open a terminal window and navigate to the folder where `l_maze.py` is located. Then type and run:
 
 `python l_maze.py`
 
-This runs the script with default parameters, meaning it will run the script on the included `example-en-in.txt` file. You should see the sentence outputs of the program in your terminal window. The output file should be named `example-en-out.txt`. If this is your first time running, you may receive an error that Levenshtein and/or other packages are not installed. You can install each one via:
-
-`pip install [package_name]`
-
+This runs the script with default parameters, meaning it will run the script on the included `example-en-in.txt` file. You should see the sentence outputs of the program in your terminal window. The output file should be named `example-en-out.txt`. 
 
 # Running With Your Items
 To run with custom parameters (i.e., your own items), use the following template:
