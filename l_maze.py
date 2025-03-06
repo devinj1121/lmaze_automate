@@ -39,28 +39,25 @@ def parse_args():
 def check(realwords, pseudowords):
     # 1: Same amount of real and pseudo before merging lists
     if len(pseudowords) != len(realwords):
-        print("ERROR-LIST Length of pseudowords not the same as length of real words for lines:")
+        print("WARNING-LIST Length of pseudowords not the same as length of real words for lines:")
         print(pseudowords)
         print(realwords)
-        exit()
     else:
         # 2: Make sure no real words match pseudowords
         for i in range(len(pseudowords)):
             if pseudowords[i] == realwords[i]:
-                print("ERROR-LIST Some real word(s) match some pseudoword(s):")
+                print("WARNING-LIST Some real word(s) match some pseudoword(s):")
                 print(pseudowords)
                 print(realwords)
-                exit()
     # 3: Same length after merging lists into strings
     merged_pseudo = " ".join(pseudowords)
     merged_real = " ".join(realwords)
     x = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_pseudo).split(r"[ \t]+")
     y = re.sub(r"\s*[\r\n]\s*", r" \r ", merged_real).split(r"[ \t]+")
     if len(x) != len(y):
-        print("ERROR-MERGE Length of pseudowords not the same as length of real words for lines:")
+        print("WARNING-MERGE Length of pseudowords not the same as length of real words for lines:")
         print(x)
         print(y)
-        exit()
 
 def get_pseudowords(line, item_dict):
     # Let a word be defined as a space-separated token in the input
@@ -205,7 +202,7 @@ if __name__ == '__main__':
     g = WuggyGenerator()
 
     if args.lang.lower() not in ["en", "ja", "ru"]:
-        print("Error: Current support only for English (en) and Japanese (ja).")
+        print("WARNING: Current support only for English (en) and Japanese (ja).")
         quit()
     if args.lang.lower() == "en":
         g.load("orthographic_english")
@@ -217,7 +214,7 @@ if __name__ == '__main__':
         # NOTE: This is not a comprehensive format check - please check that your lines are formatted as such: condition;item#;sentence
         lines = f.readlines()
         if len(lines[0].split(";")) != 3:
-            print("Error: Improper stimuli formatting. Please format sentences as follows and ensure no headings on text file. condition;item#;sentence")
+            print("WARNING: Improper stimuli formatting. Please format sentences as follows and ensure no headings on text file. condition;item#;sentence")
             quit()
         
         # Get pseudowords for each item set
