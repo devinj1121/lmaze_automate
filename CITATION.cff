@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: If you use this software, please cite it using these metadata.
-title: lmaze_automate
+title: "lmaze_automate"
 abstract: Generates pseudoword distractors for L-Maze experiments using both Wuggy and other, custom algorithms.
 authors:
   - family-names: Johnson
