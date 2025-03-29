@@ -115,8 +115,8 @@ def get_pseudowords(line, item_dict):
                 if ja_shuffle == 0:
                     word_c = pseudoword.copy()
                     while(word_c == pseudoword): 
-                        random.shuffle(word_c)
-                        pseudoword = word_c
+                        random.shuffle(word_c) 
+                    pseudoword = word_c
                     
                 # Move end particle mode
                 elif ja_shuffle == 1:

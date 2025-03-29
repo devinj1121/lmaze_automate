@@ -45,6 +45,12 @@ python l_maze.py
     -ja_shuffle [ja_shuffle]
 ````
 
+Alternatively, you may edit and run the included Bash script:
+````
+chmod +x run.sh
+./run.sh
+````
+
 These parameters are not mandatory, so if you just want to run with your items but keep the default output file name and lang "en", you can just specify the input file parameter.
 
 ## Description of Parameters
